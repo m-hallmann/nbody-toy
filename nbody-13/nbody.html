@@ -44,6 +44,24 @@
       opacity: .5;
     }
 
+    #infobox {
+      position: absolute;
+      padding: 1em;
+      top: 1.5em;
+      right: 0px;
+      color: white;
+      z-index: 100;
+      font-family: monospace;
+    }
+    #infobox a {
+      color: white;
+      text-decoration: none;
+    }
+    #infobox p {
+      text-align: right;
+      margin: .2em;
+    }
+
   </style>
 </head>
 <body style="background-color: #000; overflow: hidden;">
@@ -51,6 +69,11 @@
   <canvas id="primary-canvas"></canvas>
   <canvas id="secondary-canvas"></canvas>
   <div id="debug"><span>Console</span>intiated.</div>
+
+  <div id="infobox">
+    <a href="#" id="downloadJSON" onclick="return downloadJSON()">Download JSON</a>
+    <p>Zoom <span id="zoomLevel">0</span></p>
+  </div>
 
 </body>
 <script src="../stats.min.js"></script>

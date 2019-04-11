@@ -11,22 +11,22 @@
  *   precision, and become prohibitively expensive, very fast,
  *   since the processing load grows exponentially with the
  *   amount of bodies to simulate.
- * 
+ *
  *   The simulation currently uses newtonian physics only,
  *   which causes imprecise results for very high speeds
  *   and very close distances. (Relativistic behaviour)
- * 
+ *
  *   This Iteration does limit attraction calculations to
  *   distances below 500px to conserve processing power.
  *   a better solution would be to group distant objects
  *   into meta-objects and still calculate overall attractions.
- *    
+ *
  *   Simulate merging visual:
  *   move both bodies to the weighted center of dist(pBody, aBody)
  *   weighted by the radius of the larger body
  *   gradually shrink the smaller and gro the larger body
  *   this may shift the weighted center. test visual!
- * 
+ *
  */
 
 
@@ -34,7 +34,7 @@
  * --------------------------------------
  *   TODOS
  * --------------------------------------
- *   
+ *
  *   - Paint in Off-DOM canvases, merge and copy png into visible canvas
  *   - Shift Floats by 100.000.000 for precision
  *   - Timeshift
@@ -66,7 +66,7 @@
  *        that will provide squared values, starting at 1. This
  *        we use as a divider in the radius calculation to simulate
  *        collapse. We also use this in the color calculation to
- *        simulate ignition.          
+ *        simulate ignition.
  *   - Complex Collisions
  *      - Correct collision calculation using impulse and momentum
  *      - Gradual absorption
@@ -198,7 +198,7 @@ function density(m) {
 }
 
 
-/*  
+/*
  * --------------------------------------
  *   FUNCTIONS
  * --------------------------------------
@@ -291,7 +291,7 @@ window.addEventListener('mousedown', function(event) {
     });
     n = nbody.length;
     console.log(nbody[n-1]);
-}, false); 
+}, false);
 
 
 // Scroll for Zoom
@@ -322,7 +322,7 @@ function setZoom(delta, mouse) {
 }
 
 
-/*  
+/*
  * --------------------------------------
  *   UPDATE FUNCTION
  * --------------------------------------
@@ -366,7 +366,7 @@ function update() {
 
                         // collision check, tests for touching bodies
                         if (thisDistance >= (pBody.radius + aBody.radius) ) {
-                            
+
                             // No Collision
                             // --------------
 
@@ -392,7 +392,7 @@ function update() {
                             pBody.iAng = aAng;
 
                         } else {
-                            
+
                             // Collision
                             // -----------
 
@@ -442,13 +442,29 @@ function update() {
 function animate() {
 
     stats.begin();
-  
+
     update();
-  
+
     stats.end();
 
     requestAnimationFrame( animate );
-  
+
   }
-  
+
   animate();
+
+
+/*
+ * --------------------------------------
+ *   DOWNLOAD POSITIONS TO JSON
+ * --------------------------------------
+ */
+
+function downloadJSON(){
+  var nbody_json = JSON.stringify(nbody);
+  var link = document.getElementById('downloadJSON');
+  var data = "data:text/json;charset=utf-8," + nbody_json;
+
+  link.setAttribute('href', data);
+  link.setAttribute('download', 'nbody-export.json');
+}
