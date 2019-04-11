@@ -131,15 +131,33 @@ var clear = 0;           // counts from 0 to CLR
 var thisBody, pBody, aBody, color, isPBody, sumDX, sumDY;
 
 // Init Canvases
-var canvas0 = document.getElementById("primary-canvas");
+
+// This canvas is attached to the DOM and outputs the visuals
+var canvas0 = document.getElementById("canvas");
 var ctx0 = canvas0.getContext("2d");
 ctx0.canvas.width  = viewW;
 ctx0.canvas.height = viewH;
 
-var canvas1 = document.getElementById("secondary-canvas");
+// These canvases we draw everything in off DOM for performance gain
+
+// tracer
+var canvas1 = document.createElement("canvas");
+canvas1.width = viewW;
+canvas1.height = viewH;
 var ctx1 = canvas1.getContext("2d");
-ctx1.canvas.width  = viewW;
-ctx1.canvas.height = viewH;
+
+// Glow
+var canvas2 = document.createElement("canvas");
+canvas2.width = viewW;
+canvas2.height = viewH;
+var ctx2 = canvas2.getContext("2d");
+
+// Body
+var canvas3 = document.createElement("canvas");
+canvas3.width = viewW;
+canvas3.height = viewH;
+var ctx3 = canvas3.getContext("2d");
+
 
 // Populate N-Body Array
 for (var i = 0; i < n; i++) {
@@ -221,23 +239,38 @@ function drawBody(which) {
     thisBody = nbody[which];
     if (thisBody) {
         color = 'hsl('+thisBody.iStr/(thisBody.mass*INERTIA)*100+','+thisBody.iStr*60+'%, '+(thisBody.mass/4+40)+'%)';
+        color2 = 'hsla('+thisBody.iStr/(thisBody.mass*INERTIA)*100+','+thisBody.iStr*60+'%, '+(thisBody.mass/4+40)+'%, '+.25+')';
+        color3 = 'hsla('+thisBody.iStr/(thisBody.mass*INERTIA)*100+','+thisBody.iStr*60+'%, '+(thisBody.mass/4+40)+'%, '+.05+')';
 
         // Tracer
-        ctx0.beginPath();
-        ctx0.arc(thisBody.x * scale + offsetX,thisBody.y * scale + offsetY,.05,0,2*Math.PI);
-        ctx0.strokeStyle = color;
-        ctx0.fillStyle = color;
-        ctx0.fill();
-        ctx0.stroke();
-
-        // Body
         ctx1.beginPath();
-        ctx1.arc(thisBody.x * scale + offsetX, thisBody.y * scale + offsetY, thisBody.radius * scale,0,2*Math.PI);
-        ctx1.strokeStyle = color;
-        ctx1.fillStyle = color;
+        ctx1.arc(thisBody.x * scale + offsetX,thisBody.y * scale + offsetY,.5,0,2*Math.PI);
+        ctx1.strokeStyle = color3;
+        ctx1.fillStyle = color3;
         ctx1.fill();
         ctx1.stroke();
 
+        // Glow
+        if (thisBody.mass >=10) {
+            var gradient = ctx2.createRadialGradient(110,90,30, 100,100,70);
+            // Add two color stops
+            gradient.addColorStop(0, 'rgba(255,255,255,1)');
+            gradient.addColorStop(1, 'rgba(255,255,255,0)');
+            ctx2.beginPath();
+            ctx2.arc(thisBody.x * scale + offsetX, thisBody.y * scale + offsetY, thisBody.radius*10 * scale,0,2*Math.PI);
+            ctx2.strokeStyle = 'transparent';
+            ctx2.fillStyle = gradient;
+            ctx2.fill();
+        }
+        
+        // Body
+        ctx3.beginPath();
+        ctx3.arc(thisBody.x * scale + offsetX, thisBody.y * scale + offsetY, thisBody.radius * scale,0,2*Math.PI);
+        ctx3.strokeStyle = color;
+        ctx3.fillStyle = color;
+        ctx3.fill();
+        ctx3.stroke();
+        
     }
 }
 
@@ -317,8 +350,26 @@ function setZoom(delta, mouse) {
     }
 
     // clear tracer canvas
-    ctx0.clearRect(0, 0, viewW, viewH);
+    ctx1.clearRect(0, 0, viewW, viewH);
 
+}
+
+function outputVisuals() {
+    ctx0.clearRect(0, 0, viewW, viewH);
+    // copy canvas 1 & 2 content to canvas 0
+    ctx0.drawImage(canvas1, 0, 0);
+    ctx0.drawImage(canvas2, 0, 0);
+    ctx0.drawImage(canvas3, 0, 0);
+}
+
+// this checks the amount of bodies and the distance of the current pair,
+// to limit calulations for large groups. bad implementation, but very simple.
+function powerSaving(distance, amount) {
+    if ((amount > 500) && (distance > 500)) {
+        return false;
+    } else {
+        return true;
+    }
 }
 
 
@@ -332,8 +383,9 @@ function update() {
     output(n);
 
     // clear canvases
-    clearCanvas(ctx0, true);
-    clearCanvas(ctx1, false);
+    clearCanvas(ctx1, true);
+    clearCanvas(ctx2, false);
+    clearCanvas(ctx3, false);
 
 
     // Outer Loop
@@ -358,7 +410,7 @@ function update() {
                     // prevent calculating attraction of a body on itself. (would be infinite because 0 distance)
                     // prevent attraction Calc for distances > 500px.
                     // this is a dirty performance fix!
-                    if ((i != j) && (thisDistance <= viewH * .75)) {
+                    if ((i != j) && powerSaving(thisDistance, n)) {
 
                         // This prevents NaN, undefined and false values for thisDistance
                         // The next line returns the expression to the right if the left side is falsy
@@ -425,6 +477,8 @@ function update() {
             pBody.untouchable--;
         }
     }
+
+    outputVisuals();
 
     // increment clear counter for opaque tracers
     clear++;
