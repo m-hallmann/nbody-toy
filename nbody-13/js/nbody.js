@@ -35,20 +35,23 @@
  *   TODOS
  * --------------------------------------
  *   
- *   - Paint in Off-DOM canvases, merge and copy png into visible canvas
+ *   - Main sequence coloring for heavy bodies
+ *   - Illumination for non glowing bodies
+ *   - Realistic colorset
+ *   - Better tracers
+ *   - Basic UI
  *   - Shift Floats by 100.000.000 for precision
  *   - Timeshift
  *      - Add a time multiplier variable to main calc.
  *      - Add a slider that controls simulation speed
  *        +/-/0, shift, ctrl keybinding
+ * 
  *      - Automatically match simulation speed to processor load/frame
  *   - Zoom
  *      - Button: Center on heaviest object
  *        This requires:
  *         - Coordinate system offset
  *         - Frame by frame redrawing of offset
- *   - HDR Bloom
- *   - Main sequence for heavy bodies
  *   - JSON Export
  *   - Infinite Spherical 2D-Universe
  *      - We could add 4 additional attraction vectors,
@@ -251,13 +254,16 @@ function drawBody(which) {
         ctx1.stroke();
 
         // Glow
-        if (thisBody.mass >=10) {
-            var gradient = ctx2.createRadialGradient(110,90,30, 100,100,70);
+        if (thisBody.mass >=40) {
+            var glowRadius = thisBody.radius * 2 * scale;
+            //var gradient = ctx2.createRadialGradient(thisBody.x, thisBody.y, 0, thisBody.x, thisBody.y, thisBody.radius*10);
+            var gradient = ctx2.createRadialGradient(thisBody.x * scale + offsetX ,thisBody.y * scale + offsetY, thisBody.radius * scale - 1, thisBody.x * scale + offsetX ,thisBody.y * scale + offsetY, glowRadius);
             // Add two color stops
-            gradient.addColorStop(0, 'rgba(255,255,255,1)');
-            gradient.addColorStop(1, 'rgba(255,255,255,0)');
+            gradient.addColorStop(0, 'hsla('+thisBody.iStr/(thisBody.mass*INERTIA)*100+','+thisBody.iStr*60+'%, '+(thisBody.mass/4+40)+'%, '+.5+')');
+            gradient.addColorStop(1, 'hsla('+thisBody.iStr/(thisBody.mass*INERTIA)*100+','+thisBody.iStr*60+'%, '+(thisBody.mass/4+40)+'%, '+0+')');
+
             ctx2.beginPath();
-            ctx2.arc(thisBody.x * scale + offsetX, thisBody.y * scale + offsetY, thisBody.radius*10 * scale,0,2*Math.PI);
+            ctx2.arc(thisBody.x * scale + offsetX, thisBody.y * scale + offsetY,  glowRadius,0,2*Math.PI);
             ctx2.strokeStyle = 'transparent';
             ctx2.fillStyle = gradient;
             ctx2.fill();
@@ -314,8 +320,8 @@ window.addEventListener('mousedown', function(event) {
 
     // x and y should also consider zoom level!
     nbody.push({
-        x: event.clientX - viewW/2,
-        y: event.clientY - viewH/2,
+        x: (event.clientX - offsetX) / scale,
+        y: (event.clientY - offsetY) / scale,
         iStr: 15 + Math.random() * 15,
         iAng: Math.random() * Math.PI * 2,
         mass: myMass,
@@ -325,6 +331,28 @@ window.addEventListener('mousedown', function(event) {
     n = nbody.length;
     console.log(nbody[n-1]);
 }, false); 
+
+
+//var mousedownID = -1;  //Global ID of mouse down interval
+//function mousedown(event) {
+//  if(mousedownID==-1)  //Prevent multimple loops!
+//     mousedownID = setInterval(whilemousedown, 100 /*execute every 100ms*/);
+//}
+//function mouseup(event) {
+//     if(mousedownID!=-1) {  //Only stop if exists
+//       clearInterval(mousedownID);
+//     mousedownID=-1;
+//   }
+//}
+//function whilemousedown() {
+   /*here put your code*/
+//}
+//Assign events
+//document.addEventListener("mousedown", mousedown);
+//document.addEventListener("mouseup", mouseup);
+//Also clear the interval when user leaves the window with mouse
+//document.addEventListener("mouseout", mouseup);
+
 
 
 // Scroll for Zoom
