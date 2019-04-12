@@ -1,0 +1,58 @@
+<!doctype=html>
+<html>
+<head>
+  <style type="text/css">
+    body, html {background-color:#000000; color:#555555; margin:0; padding: 0; height: 100%;}
+
+
+
+    #debug {
+      position: absolute;
+      top: 0px;
+      right: 0px;
+      color: #fff;
+      background: rgba(0,0,0,.8);
+      padding: 1em;
+      font-family: monospace;
+    }
+
+    #debug span {
+      color: #6aa;
+      font-weight: bold;
+    }
+
+    #debug span:after {
+      content: ': ';
+      color: #fff;
+      font-weight: bold;
+    }
+    #debug i.col {
+      padding: 1em;
+      background: #fff;
+      border-radius: 99em;
+    }
+
+    canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+    }
+
+    #primary-canvas {
+      opacity: .5;
+    }
+
+  </style>
+</head>
+<body style="background-color: #000; overflow: hidden;">
+
+  <canvas id="primary-canvas"></canvas>
+  <canvas id="secondary-canvas"></canvas>
+  <div id="debug"><span>Console</span>intiated.</div>
+
+</body>
+<script src="../stats.min.js"></script>
+<script type="text/javascript" src="js/nbody-12.js"></script>
+</html>
