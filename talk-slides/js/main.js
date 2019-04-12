@@ -2,11 +2,27 @@ var slideCounter = 0;
 var slideCounterOld = 0;
 var slides = document.getElementsByClassName('slide');
 
+
+function addSrc(slideNr) {
+  var allIframes = document.querySelectorAll(".slide iframe");
+  var iframe = document.getElementById('slide-'+slideNr).getElementsByTagName("iframe")[0];
+  var src = iframe.getAttribute('src');
+  var data = iframe.getAttribute("data-src");
+
+  for (var i = 0; i < allIframes.length; i++) {
+      allIframes[i].setAttribute("src","");
+  }
+
+  iframe.setAttribute("src",data);
+
+}
+
+
 document.body.addEventListener("keyup", function(event) {
     // arrow.right arrow.bottom spacebar enter
     if (event.isComposing || event.keyCode === 39 || event.keyCode === 40 || event.keyCode === 32 || event.keyCode === 13) {
         slideCounter++;
-    } 
+    }
     // arrow.up arrow.left backspace escape
     else if (event.keyCode === 37 || event.keyCode === 38 || event.keyCode === 8 || event.keyCode === 27) {
         slideCounter--;
@@ -21,10 +37,11 @@ document.body.addEventListener("keyup", function(event) {
     }
     if (slideCounter < 0) { slideCounter = 0 }
     if (slideCounter >= slides.length) { slideCounter = slides.length-1 }
-  
+
     if (slideCounter != slideCounterOld) {
         for (var i = 0; i < slides.length; i++) {
             slides[i].classList.remove("active");
+            addSrc(slideCounter);
             //slides[i].getElementById('iframe-'+i).setAttribute('src', '');
         }
         console.log(slideCounter);
