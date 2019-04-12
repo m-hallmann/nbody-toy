@@ -111,3 +111,11 @@ iframe.stage {
     color: blue; }
   100% {
     color: red; } }
+
+
+/* iframes */
+.slide iframe {
+  border: 0;
+  width: 100vw;
+  height: 100vh;
+}
