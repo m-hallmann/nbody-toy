@@ -1,0 +1,193 @@
+<!doctype=html>
+<html>
+<head>
+  <script src="http://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js" type="text/javascript"></script>
+  <script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.11.2/jquery-ui.min.js" type="text/javascript"></script>
+  <script src="http://cdnjs.cloudflare.com/ajax/libs/modernizr/2.6.2/modernizr.min.js" type="text/javascript"></script>
+
+  <style type="text/css">
+    body, html {background-color:#000000; color:#555555; margin:0; padding: 0; height: 100%;}
+
+
+
+    #debug {
+      position: absolute;
+      top: 0px;
+      right: 0px;
+      color: #fff;
+      background: rgba(0,0,0,.8);
+      padding: 1em;
+      font-family: monospace;
+    }
+
+    #debug span {
+      color: #6aa;
+      font-weight: bold;
+    }
+
+    #debug span:after {
+      content: ': ';
+      color: #fff;
+      font-weight: bold;
+    }
+    #debug i.col {
+      padding: 1em;
+      background: #fff;
+      border-radius: 99em;
+    }
+
+    canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+    }
+
+  </style>
+</head>
+<body style="background-color: #000; overflow: hidden;">
+
+  <canvas width="1920" height="1200" id="primary-canvas"></canvas>
+  <canvas width="1920" height="1200" id="secondary-canvas"></canvas>
+  <div id="debug"><span>Console</span>intiated.</div>
+
+</body>
+<script src="../stats.min.js"></script>
+<script type="text/javascript">
+
+// init canvas
+var canvas = document.getElementById("primary-canvas");
+var ctx = canvas.getContext("2d");
+
+var canvas1 = document.getElementById("secondary-canvas");
+var ctx1 = canvas1.getContext("2d");
+
+ctx.font = "12px Arial"; // global canvas font setting
+ctx1.font = "12px Arial"; // global canvas font setting
+
+
+//setting up stats panel
+var stats = new Stats();
+stats.showPanel( 1 );
+document.body.appendChild( stats.dom );
+
+
+// constants
+
+var n = 200;        // number of bodies
+
+var g = .00091;       // gravity
+
+var vscale = 100; // vector scaling
+
+var dampener = .9;
+
+// populate nbody field
+var nbody = [];
+for (var i = 0; i < n; i++) {
+    nbody.push({ });
+    nbody[i].x = 1000;     // x
+    nbody[i].y = 500;     // y
+    nbody[i].is = Math.random() * 15;                  // impulse strength
+    nbody[i].ia = Math.random() * Math.PI * 2;        // impulse angle, radians (2*PI)
+    nbody[i].m = 255; //100 + Math.random() * 900;           // mass
+}
+
+
+
+// ----------------------
+// core functions
+// ----------------------
+
+function dist(x1, y1, x2, y2) {  // works, delivers always positive value. -> does it really?
+  return Math.sqrt((x2-x1)*(x2-x1)+(y2-y1)*(y2-y1));
+}
+
+function radian(x1, y1, x2, y2) {
+  return Math.atan2(x2 - x1, y2 - y1); // In radians, bottom is 0, top is 3.1415
+}
+
+function deltaX (angle, strength) {
+  return Math.cos(angle) * strength; // turns angular vector into x delta coordinate
+}
+
+function deltaY (angle, strength) {
+  return Math.sin(angle) * strength; // turns angular vector into y delta coordinate
+}
+
+function grav(m, dist) {
+  return (m * g) / Math.pow(dist, 2);
+}
+
+function radius(m) {
+  // it would be nice to calculate density, but one challenge at a time.
+  // density could be a multiplier that delivers a value that grows very slowly and then increases enormously at large m values
+  // combined with luminosity and radiation pressure, simulating stars would become feasible.
+  // not sure how to incorporate more than the main sequence of star development: https://de.wikipedia.org/wiki/Hauptreihe#/media/File:HRDiagram.png
+
+  return Math.sqrt(m/Math.PI); // this assumes mass is f(x) = x of the surface area and returns the radius. iff mass increases density, insert factor here.
+
+}
+
+
+
+
+// ----------------------
+// simulation functions
+// ----------------------
+
+
+function update() {
+  //ctx.fillStyle='rgba(0,0,0,.01)';//"#000";
+  //ctx.fillRect(0, 0, 2000, 2000);
+  ctx1.clearRect(0, 0, canvas.width, canvas.height);
+
+  for (var i = 0; i < n; i++) {
+
+    for (var j = 0; j < n; j++) {
+    }
+
+    if (i < n) {
+
+      // draw nbody circles
+      ctx1.beginPath();
+      ctx1.shadowColor = 'rgba('+nbody[i].m.toFixed(0)+', '+nbody[i].m.toFixed(0)/2+', 0, 1)';
+      ctx1.shadowOffsetX = 0;
+      ctx1.shadowOffsetY = 0;
+      ctx1.shadowBlur = 20;
+      ctx1.arc(nbody[i].x,nbody[i].y,radius(nbody[i].m),0,2*Math.PI);
+      ctx1.strokeStyle = 'rgba('+nbody[i].m.toFixed(0)+', '+nbody[i].m.toFixed(0)/2+', 0, 0)';
+      ctx1.fillStyle = 'rgba('+nbody[i].m.toFixed(0)+', '+nbody[i].m.toFixed(0)/2+', 0, .5)';
+      ctx1.fill();
+      ctx1.stroke();
+
+      nbody[i].m *= .985;
+      nbody[i].is *= .985;
+
+      nbody[i].x += deltaX(nbody[i].ia,nbody[i].is); // updates x position based on impulse vector. ignores inertia
+      nbody[i].y += deltaY(nbody[i].ia,nbody[i].is); // updates y position based on impulse vector. ignores inertia
+
+    }
+
+  }
+}
+
+
+function animate() {
+
+
+  stats.begin();
+
+  update();
+
+  stats.end();
+
+  requestAnimationFrame( animate );
+
+}
+
+animate();
+
+
+
+</script>
+</html>

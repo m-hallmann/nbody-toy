@@ -1,0 +1,291 @@
+<!doctype=html>
+<html>
+<head>
+  <script src="http://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js" type="text/javascript"></script>
+  <script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.11.2/jquery-ui.min.js" type="text/javascript"></script>
+  <script src="http://cdnjs.cloudflare.com/ajax/libs/modernizr/2.6.2/modernizr.min.js" type="text/javascript"></script>
+  <script src="stats.min.js"></script>
+
+  <style type="text/css">
+    body, html {background-color:#000000; color:#555555; margin:0; padding: 0; height: 100%;}
+
+    canvas {
+        position: absolute;
+        top: 0;
+        left: 0;
+    }
+
+    #debug {
+        position: absolute;
+        top: 0px;
+        right: 0px;
+        color: #fff;
+        background: rgba(0,0,0,.8);
+        padding: 1em;
+        font-family: monospace;
+    }
+
+  </style>
+</head>
+<body style="background-color: #000; overflow: hidden;">
+
+  <canvas id="output"></canvas>
+
+</body>
+<script type="text/javascript">
+
+
+
+// ---------------------------------------------------
+// MATH INIT
+// ---------------------------------------------------
+
+// constants
+var n = 10;                     // number of bodies
+var GRAVCONST = 0.0667408;      // gravitational constant
+                                // 0.0000000000667408 real world value, 
+                                // but 6.6*10^-2 works better in 2D sim
+                                // than 6.6*10^-11.
+var INERTIA = 1;                // Inertia Constant. Not realistic, works in sim.
+                                // body.impulse.strength / (body.mass * INERTIA) in the movement update equation.
+                                // a very hacky way to stop the runaway heavy mass effect.
+                                // >>> Probably needs to be calculated into the attractionVector + impulseVector equation instead.
+
+// variables
+var windowX, windowY;           // window size
+var viewOffsetX = 0;            // x offset for scrolling
+var viewOffsetY = 0;            // y offset for scrolling
+
+
+// ---------------------------------------------------
+// CLIENT RELATED CANVAS SIZING & SCALING
+// ---------------------------------------------------
+
+// output canvas sizing
+$(document).ready(function() {
+    windowX = window.innerWidth;
+    windowY = window.innerHeight;
+
+    output.canvas.width  = windowX;
+    output.canvas.height = windowY;
+    canvas3.width  = windowX;
+    canvas3.height = windowY;
+});
+
+// output canvas resizing
+$(window).resize(function() {
+    windowX = window.innerWidth;
+    windowY = window.innerHeight;
+
+    output.canvas.width  = windowX;
+    output.canvas.height = windowY;
+    canvas3.width  = windowX;
+    canvas3.height = windowY;
+});
+
+  // ---------------------------------------------------
+  // OFF DOM CANVAS STRUCTURE
+  // ---------------------------------------------------
+  // We're using several off DOM canvas objects to do our drawing.
+  // Currently, we have three. page1 is persistent, page2&3 are cleared for every frame.
+  // All pages are stacked in ascending order and transferred to the output canvas.
+  // This process allows for layered persistence and effects, and reduces the amount of DOM manipulations significantly.
+
+  // init output canvas
+  var canvas0 = document.getElementById("output");
+  var output = canvas0.getContext("2d");
+
+  // init page1 canvas
+  var canvas1 = document.createElement('canvas');
+      canvas1.width  = 10000;
+      canvas1.height = 10000;
+  var page1 = canvas1.getContext("2d");
+
+  // init page2 canvas
+  var canvas2 = document.createElement('canvas');
+      canvas2.width  = 10000;
+      canvas2.height = 10000;
+  var page2 = canvas2.getContext("2d");
+
+  // init page3 canvas
+  // page3 canvas is a non scaling canvas meant for static output (i.e. graphs)
+  var canvas3 = document.createElement('canvas');
+      //can't refer to windowX and Y because this runs before the windowX and Y routine.    
+      canvas3.width  = window.innerWidth;
+      canvas3.height = window.innerHeight;
+  var page3 = canvas3.getContext("2d");
+
+  // ---------------------------------------------------
+  // CANVAS FUNCTIONS
+  // ---------------------------------------------------
+ 
+  // merges all off DOM canvas pages in ascending order and copies their content to the output canvas
+  function mergePages() {
+    output.drawImage(canvas1, canvas1.width/2 - canvas0.width/2 + viewOffsetX, canvas1.height/2 - canvas0.height/2 + viewOffsetY);
+    output.drawImage(canvas2, canvas1.width/2 - canvas0.width/2 + viewOffsetX, canvas1.height/2 - canvas0.height/2 + viewOffsetY);
+    output.drawImage(canvas3, 0, 0);
+  }
+
+  // ---------------------------------------------------
+  // CORE FUNCTIONS
+  // ---------------------------------------------------
+
+  // calculates distance in px between two coordinate sets
+  function distance(x1, y1, x2, y2) {  // works, delivers always positive value. -> does it really?
+    return Math.sqrt((x2-x1)*(x2-x1)+(y2-y1)*(y2-y1));
+  }
+
+  //calculates the radian angle between two coordinate sets
+  function radian(x1, y1, x2, y2) {
+    return Math.atan2(x2 - x1, y2 - y1); // In radians, bottom is 0, top is 3.1415
+  }
+
+  //calculates the radian angle between two nbody[] objects
+  function radianBodies(a, b) {
+    return Math.atan2(nbody[b].location.x - nbody[a].location.x, nbody[b].location.y - nbody[a].location.y); // In radians, bottom is 0, top is 3.1415
+  }
+
+  function deltaX(angle, strength) {
+    return Math.cos(angle) * strength; // turns angular vector into x delta coordinate
+  }
+
+  function deltaY(angle, strength) {
+    return Math.sin(angle) * strength; // turns angular vector into y delta coordinate
+  }
+
+  // this calculates the gravitational acceleration body1 experiences due to body2 
+  function gravAccel(body1, body2) {
+    var radius = distance(nbody[body1].location.x, nbody[body1].location.y,
+                          nbody[body2].location.x, nbody[body2].location.y);
+    
+    return GRAVCONST * (nbody[body2].mass / Math.pow(radius, 2));
+  }
+
+  function radius(m) {
+    // it would be nice to calculate density, but one challenge at a time.
+    // density could be a multiplier that delivers a value that grows very slowly and then increases enormously at large m values
+    // combined with luminosity and radiation pressure, simulating stars would become feasible.
+    // not sure how to incorporate more than the main sequence of star development: https://de.wikipedia.org/wiki/Hauptreihe#/media/File:HRDiagram.png
+
+    return Math.sqrt(m/Math.PI); // this assumes mass is f(x) = x of the surface area and returns the radius. iff mass increases density, insert factor here.
+
+  }
+
+
+
+  // ---------------------------------------------------
+  // nBody Object Array
+  // ---------------------------------------------------
+  
+  // populate nbody field
+  var nbody = [];
+  for (var i = 0; i < n; i++) {
+      nbody.push({
+          location: {
+              x: Math.random()*1920,
+              y: Math.random()*1200
+          },
+          impulse: {
+              strength: 0,
+              angle: 0
+          },
+          mass: 5
+      });
+  }
+
+
+  // ---------------------------------------------------
+  // Main Functions
+  // ---------------------------------------------------
+
+  function finiteSpace(i) {
+    // connects screen borders so that an infinite 2d universe is projected (like the surface of a sphere)
+    if (nbody[i].location.x >= 2000) { nbody[i].location.x = -50; }
+    else if (nbody[i].location.x <= -50) { nbody[i].location.x = 2000; }
+    if (nbody[i].location.y >= 1200) { nbody[i].location.y = -50; }
+    else if (nbody[i].location.y <= -50) { nbody[i].location.y = 1200; }
+  }
+
+  function updateImpulse(a, attr, rad) {
+    // this is wrong, we need to add these, instead of overwriting.
+    //nbody[a].impulse.strength = attr;
+    //nbody[a].impulse.angle = Math.PI * .5 - rad; // I don't understand it, but here, we need to subtract from half a radian.
+    
+    var impulseX = deltaX(nbody[a].impulse.strength, nbody[a].impulse.angle);
+    var impulseY = deltaY(nbody[a].impulse.strength, nbody[a].impulse.angle);
+    var attrX = deltaX(attr, rad);
+    var attrY = deltaY(attr, rad);
+
+    impulseX += attrX;
+    impulseY += attrY;
+    
+
+    nbody[a].impulse.strength = distance(nbody[a].location.x, impulseX, nbody[a].location.y, impulseY);
+    nbody[a].impulse.angle = radian(nbody[a].location.x, impulseX, nbody[a].location.y, impulseY);
+  }
+
+  function update() {
+
+    // here, we iterate through all objects,
+    // and per object which is considered the TARGET of effects,
+    // we are iterating through all other objects,
+    // which are considered SOURCEs for TARGETs effects.
+
+    //page1.fillStyle='rgba(0,0,0,.05)';//"#000";
+    //page1.fillRect(0, 0, 2000, 2000);
+
+    for (var target = 0; target < n; target++) {
+
+      // connect edges of universe
+      finiteSpace(target);
+
+
+
+      // draw nbody circles
+      page1.beginPath();
+      page1.arc(nbody[target].location.x, nbody[target].location.y, radius(nbody[target].mass), 0, 2*Math.PI);
+      page1.fillStyle = 'rgba(255, 255, 255,1)';
+      page1.fill();
+
+
+      for (var source = 0; source < n; source++) {
+      
+        // exclude same object comparisons
+        if (target != source) {
+          var attraction = gravAccel(target, source);
+          var angle = radianBodies(target, source);
+
+          updateImpulse(target, attraction, angle);
+        }
+      } // end of source loop
+
+      //update nbody coordinates
+      // updates xy position based on impulse vector. ignores inertia?
+      nbody[target].location.x += deltaX(nbody[target].impulse.angle, nbody[target].impulse.strength);
+      nbody[target].location.y += deltaY(nbody[target].impulse.angle, nbody[target].impulse.strength);
+
+    } // end of target loop
+    
+    // this paints all drawings from this frame onto the output canvas
+    mergePages();
+
+  }
+
+
+function animate() {
+
+  //stats.begin();
+  update();
+  //stats.end();
+  requestAnimationFrame( animate );
+}
+
+animate();
+
+
+
+
+  // ##################################################################################
+
+</script>
+</html>

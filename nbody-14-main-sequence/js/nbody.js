@@ -114,11 +114,11 @@ function output(value) {
 }
 
 // Constants
-var N_INITIAL = 750;     // Number of bodies
+var N_INITIAL = 1;     // Number of bodies
 var G = 0.0667408;       // Gravitational constant - modify this to modulate gravitational strength
 var INERTIA = 1;         // Inertia multiplier - this is a hack!
 var TIME = 1;            // Time multiplier - modify to modulate time flow
-var CLR = 150;            // clear constant; every CLRth iteration, the screen is cleared with opaque black.
+var CLR = 350;            // clear constant; every CLRth iteration, the screen is cleared with opaque black.
 
 // Init Variables
 var viewW = window.innerWidth;           // viewport width, not updated!
@@ -164,16 +164,16 @@ var ctx3 = canvas3.getContext("2d");
 
 // Populate N-Body Array
 for (var i = 0; i < n; i++) {
-    var myMass = 2 + Math.random() * 10;
+    var myMass = 1;
     nbody.push({
-        x: (Math.random() * viewW) - viewW/2,
-        y: (Math.random() * viewH) - viewH/2,
-        iStr: Math.random() * 15,
-        iAng: Math.random() * Math.PI * 2,
+        x: 0,
+        y: 0,
+        iStr: 0,
+        iAng: 0,
         mass: myMass,
         radius: radius(myMass),
         untouchable: 0,
-        colliding: 0
+        transform: 0
     });
 }
 
@@ -215,7 +215,7 @@ function density(m) {
     // y = 0.1 * x^2 + 1        modify the x multiplier to strengthen or weaken the effect.
     // This can be used to calculate compression of heavy bodies and ignition of super heavy bodies.
 
-    return 0.1 * (m * m) + 1;
+    return 0.001 * (m * m) + 1;
 }
 
 
@@ -482,11 +482,17 @@ function update() {
                             // based on impulse, mass and density as a simplified model.
 
                             mergeBodies(i, j);
+
+                            pBody.iStr *= .9999999;
                         }
+
                     }
+
                 }
             }
         }
+
+
 
         // Update Positions
         // updates x,y position based on impulse vector.
@@ -501,6 +507,10 @@ function update() {
     }
 
     outputVisuals();
+
+    nbody[0].mass += 1;
+    //nbody[0].iStr += .2;
+    nbody[0].radius = radius(nbody[0].mass);
 
     // increment clear counter for opaque tracers
     clear++;

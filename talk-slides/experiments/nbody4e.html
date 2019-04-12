@@ -1,0 +1,261 @@
+<!doctype=html>
+<html>
+<head>
+  <script src="http://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js" type="text/javascript"></script>
+  <script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.11.2/jquery-ui.min.js" type="text/javascript"></script>
+  <script src="http://cdnjs.cloudflare.com/ajax/libs/modernizr/2.6.2/modernizr.min.js" type="text/javascript"></script>
+
+  <style type="text/css">
+    body, html {background-color:#000000; color:#555555; margin:0; padding: 0; height: 100%;}
+
+    #debug {
+      position: absolute;
+      top: 0px;
+      right: 0px;
+      color: #fff;
+      background: rgba(0,0,0,.8);
+      padding: 1em;
+      font-family: monospace;
+    }
+
+    #debug span {
+      color: #6aa;
+      font-weight: bold;
+    }
+
+    #debug span:after {
+      content: ': ';
+      color: #fff;
+      font-weight: bold;
+    }
+    #debug i.col {
+      padding: 1em;
+      background: #fff;
+      border-radius: 99em;
+    }
+
+    canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+    }
+
+  </style>
+</head>
+<body style="background-color: #000; overflow: hidden;">
+
+  <canvas width="1920" height="1200" id="primary-canvas"></canvas>
+  <canvas width="1920" height="1200" id="secondary-canvas"></canvas>
+  <div id="debug"><span>Console</span>intiated.</div>
+
+</body>
+<script src="../stats.min.js"></script>
+<script type="text/javascript">
+
+// init canvas
+var canvas = document.getElementById("primary-canvas");
+var ctx = canvas.getContext("2d");
+
+var canvas1 = document.getElementById("secondary-canvas");
+var ctx1 = canvas1.getContext("2d");
+
+ctx.font = "12px Arial"; // global canvas font setting
+ctx1.font = "12px Arial"; // global canvas font setting
+
+
+//setting up stats panel
+var stats = new Stats();
+stats.showPanel( 1 );
+document.body.appendChild( stats.dom );
+
+
+// constants
+
+var n = 4;        // number of bodies
+
+var g = .91;       // gravity
+
+var vscale = 100; // vector scaling
+
+
+// populate nbody field
+var nbody = [];
+for (var i = 0; i < n; i++) {
+    nbody.push({ });
+}
+
+nbody[0].x = 400;     // x
+nbody[0].y = 400;     // y
+nbody[0].is = 0;                  // impulse strength
+nbody[0].ia = 0;        // impulse angle, radians (2*PI)
+nbody[0].m = 500;           // mass
+
+nbody[1].x = 800;     // x
+nbody[1].y = 400;     // y
+nbody[1].is = 0;                  // impulse strength
+nbody[1].ia = 0;        // impulse angle, radians (2*PI)
+nbody[1].m = 500;           // mass
+
+nbody[2].x = 400;     // x
+nbody[2].y = 800;     // y
+nbody[2].is = 0;                  // impulse strength
+nbody[2].ia = 0;        // impulse angle, radians (2*PI)
+nbody[2].m = 500;           // mass
+
+nbody[3].x = 800;     // x
+nbody[3].y = 800;     // y
+nbody[3].is = 0;                  // impulse strength
+nbody[3].ia = 0;        // impulse angle, radians (2*PI)
+nbody[1].m = 500;           // mass
+
+
+// ----------------------
+// core functions
+// ----------------------
+
+function dist(x1, y1, x2, y2) {  // works, delivers always positive value. -> does it really?
+  return Math.sqrt((x2-x1)*(x2-x1)+(y2-y1)*(y2-y1));
+}
+
+function radian(x1, y1, x2, y2) {
+  return Math.atan2(x2 - x1, y2 - y1); // In radians, bottom is 0, top is 3.1415
+}
+
+function deltaX (angle, strength) {
+  return Math.cos(angle) * strength; // turns angular vector into x delta coordinate
+}
+
+function deltaY (angle, strength) {
+  return Math.sin(angle) * strength; // turns angular vector into y delta coordinate
+}
+
+function grav(m, dist) {
+  return (m * g) / Math.pow(dist, 2);
+}
+
+function radius(m) {
+  // it would be nice to calculate density, but one challenge at a time.
+  // density could be a multiplier that delivers a value that grows very slowly and then increases enormously at large m values
+  // combined with luminosity and radiation pressure, simulating stars would become feasible.
+  // not sure how to incorporate more than the main sequence of star development: https://de.wikipedia.org/wiki/Hauptreihe#/media/File:HRDiagram.png
+
+  return Math.sqrt(m/Math.PI); // this assumes mass is f(x) = x of the surface area and returns the radius. iff mass increases density, insert factor here.
+
+}
+
+
+
+
+// ----------------------
+// simulation functions
+// ----------------------
+
+
+function update() {
+  //ctx.fillStyle='rgba(0,0,0,1)';//"#000";
+  //ctx.fillRect(0, 0, 2000, 2000);
+  ctx1.clearRect(0, 0, canvas.width, canvas.height);
+
+  for (var i = 0; i < n; i++) {
+
+    // no extreme positions, finite universe
+    if (nbody[i].x >= 2000) { nbody[i].x = -50; }
+    else if (nbody[i].x <= -50) { nbody[i].x = 2000; }
+    if (nbody[i].y >= 1200) { nbody[i].y = -50; }
+    else if (nbody[i].y <= -50) { nbody[i].y = 1200; }
+
+    var contact = 0;
+    for (var j = 0; j < n; j++) {
+
+
+      if (i != j) {
+        var myDist = dist(nbody[i].x, nbody[i].y, nbody[j].x, nbody[j].y);
+        myDist = myDist || 0;
+
+        var myG = grav(nbody[j].x, myDist);
+        var myRad = radian(nbody[i].x, nbody[i].y, nbody[j].x, nbody[j].y);
+
+
+        // draw attraction vector from object center
+        // for some reason, deltaX and Y need to be reversed. weird!
+
+        var attrX = deltaY(myRad, myG);
+        var attrY = deltaX(myRad, myG);
+
+        var as = dist(nbody[i].x, nbody[i].y, nbody[i].x + deltaX(nbody[i].ia, nbody[i].is) + attrX, nbody[i].y + deltaY(nbody[i].ia, nbody[i].is) + attrY);
+        //var aa = Math.PI * .5 - radian(nbody[i].x, nbody[i].y, nbody[i].x + deltaX(nbody[i].ia, nbody[i].is) + attrX, nbody[i].y + deltaY(nbody[i].ia, nbody[i].is) + attrY);
+        var aa = Math.PI * .5 - radian(nbody[i].x, nbody[i].y, nbody[i].x + deltaX(nbody[i].ia, nbody[i].is) + attrX, nbody[i].y + deltaY(nbody[i].ia, nbody[i].is) + attrY);
+
+
+        ctx1.fillStyle ='#fff';
+        ctx1.fillText(nbody[i].is,nbody[i].x+25,nbody[i].y);
+        ctx1.fillText(as,nbody[i].x+175,nbody[i].y);
+        ctx1.fillText(nbody[i].ia,nbody[i].x+25,nbody[i].y + 15);
+        ctx1.fillText(aa,nbody[i].x+175,nbody[i].y + 15);
+        ctx1.fillStyle ='transparent';
+
+
+
+        // update impulse vector
+
+        //nbody[i].is = dist(nbody[i].x, nbody[i].y, nbody[i].x + deltaX(nbody[i].ia, nbody[i].is) + deltaY(myRad, myG), nbody[i].y + deltaY(nbody[i].ia, nbody[i].is) + deltaX(myRad, myG));
+        //nbody[i].ia = radian(nbody[i].x, nbody[i].y, nbody[i].x + deltaX(nbody[i].ia, nbody[i].is) + deltaY(myRad, myG), nbody[i].y + deltaY(nbody[i].ia, nbody[i].is) + deltaX(myRad, myG));
+
+        // BUG BUG BUG
+        //nbody[i].is = as;
+        //nbody[i].ia = aa;
+        // BUG BUG BUG
+
+      }
+    }
+
+
+    //ctx.beginPath();
+    //ctx.moveTo(nbody[i].x,nbody[i].y);
+    //ctx.strokeStyle = 'rgba(255,80,80,1)';
+    // this draws the impulse vector, with a magnification of 100.
+    // (a line towards the position the nbody will be located in at the next simulation frame.)
+    //ctx.lineTo(nbody[i].x + (deltaX(nbody[i].ia, nbody[i].is) * 100), nbody[i].y+(deltaY(nbody[i].ia, nbody[i].is) * 100));
+    //ctx.closePath();
+    //ctx.stroke();
+
+
+    // draw nbody circles
+    ctx.beginPath();
+    //ctx.arc(nbody[i].x,nbody[i].y,radius(nbody[i].m),0,2*Math.PI);
+    ctx.arc(nbody[i].x,nbody[i].y,.5,0,2*Math.PI);
+    ctx.strokeStyle = 'rgba(255, 255, 255, 1)';
+    ctx.fillStyle = 'rgba(255, 255, 255, ' + (contact/4) + ')';
+    ctx.fill();
+    ctx.stroke();
+
+
+
+
+    nbody[i].x += deltaX(nbody[i].ia,nbody[i].is); // updates x position based on impulse vector. ignores inertia
+    nbody[i].y += deltaY(nbody[i].ia,nbody[i].is); // updates y position based on impulse vector. ignores inertia
+
+
+  }
+}
+
+
+function animate() {
+
+
+  stats.begin();
+
+  update();
+
+  stats.end();
+
+  requestAnimationFrame( animate );
+
+}
+
+animate();
+
+
+
+</script>
+</html>
