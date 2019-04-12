@@ -74,7 +74,7 @@ iframe.stage {
         &.danger {
             font-family: 'Staatliches', cursive;    
             color: #a00;
-
+            animation: colorchange 1s infinite;
         }
     }
     
@@ -84,3 +84,9 @@ iframe.stage {
     }
 }
     
+@keyframes colorchange
+{
+  0%   {color: red;}
+  50%  {color: yellow;}
+  100% {color: red;}
+}

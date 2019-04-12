@@ -67,7 +67,16 @@ iframe.stage {
     font-size: 180px; }
     .slide article h1.danger {
       font-family: 'Staatliches', cursive;
-      color: #a00; }
+      color: #a00;
+      animation: colorchange 1s infinite; }
   .slide article p {
     font-size: 40px;
     font-family: 'Staatliches', cursive; }
+
+@keyframes colorchange {
+  0% {
+    color: red; }
+  50% {
+    color: yellow; }
+  100% {
+    color: red; } }

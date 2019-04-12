@@ -2,6 +2,11 @@ var slideCounter = 0;
 var slideCounterOld = 0;
 var slides = document.getElementsByClassName('slide');
 
+slides[0].classList.add('active');
+for (var i = 0; i < slides.length; i++) {
+    slides[i].classList.add('slide-'+i);
+}
+
 document.body.addEventListener("keyup", function(event) {
     // arrow.right arrow.bottom spacebar enter
     if (event.isComposing || event.keyCode === 39 || event.keyCode === 40 || event.keyCode === 32 || event.keyCode === 13) {
