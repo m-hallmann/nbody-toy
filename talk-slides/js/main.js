@@ -16,16 +16,7 @@ function addIframe(slideNr) {
 
   if (src) {
     activeSlide.insertAdjacentHTML('afterbegin', '<iframe src="'+src+'"></iframe>');
-    console.log("yes");
   }
-
-  // var iframe = document.getElementById('slide-'+slideNr).getElementsByTagName("iframe")[0];
-  // var src = iframe.getAttribute('src');
-  // var data = iframe.getAttribute("data-src");
-  // iframe.setAttribute("src",data);
-
-  console.log(activeSlide, src);
-
 }
 
 
