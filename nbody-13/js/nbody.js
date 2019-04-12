@@ -257,7 +257,7 @@ function drawBody(which) {
         if (thisBody.mass >=40) {
             var glowRadius = thisBody.radius * 2 * scale;
             //var gradient = ctx2.createRadialGradient(thisBody.x, thisBody.y, 0, thisBody.x, thisBody.y, thisBody.radius*10);
-            var gradient = ctx2.createRadialGradient(thisBody.x * scale + offsetX ,thisBody.y * scale + offsetY, thisBody.radius * scale - 1, thisBody.x * scale + offsetX ,thisBody.y * scale + offsetY, glowRadius);
+            var gradient = ctx2.createRadialGradient(thisBody.x * scale + offsetX ,thisBody.y * scale + offsetY, thisBody.radius * scale, thisBody.x * scale + offsetX ,thisBody.y * scale + offsetY, glowRadius);
             // Add two color stops
             gradient.addColorStop(0, 'hsla('+thisBody.iStr/(thisBody.mass*INERTIA)*100+','+thisBody.iStr*60+'%, '+(thisBody.mass/4+40)+'%, '+.5+')');
             gradient.addColorStop(1, 'hsla('+thisBody.iStr/(thisBody.mass*INERTIA)*100+','+thisBody.iStr*60+'%, '+(thisBody.mass/4+40)+'%, '+0+')');
@@ -329,7 +329,7 @@ window.addEventListener('mousedown', function(event) {
         untouchable: 10
     });
     n = nbody.length;
-    console.log(nbody[n-1]);
+    //console.log(nbody[n-1]);
 }, false); 
 
 
