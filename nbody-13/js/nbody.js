@@ -118,7 +118,7 @@ var N_INITIAL = 750;     // Number of bodies
 var G = 0.0667408;       // Gravitational constant - modify this to modulate gravitational strength
 var INERTIA = 1;         // Inertia multiplier - this is a hack!
 var TIME = 1;            // Time multiplier - modify to modulate time flow
-var CLR = 150;            // clear constant; every CLRth iteration, the screen is cleared with opaque black.
+var CLR = 25;            // clear constant; every CLRth iteration, the screen is cleared with opaque black.
 
 // Init Variables
 var viewW = window.innerWidth;           // viewport width, not updated!
@@ -229,7 +229,7 @@ function clearCanvas(context, opaque) {
     if (opaque) {
         // opaqueness is created by a relatively intransparent clear effect and a clear counter, only working it every CLR iterations. this reduces grey traces.
         if (clear == CLR) {
-            context.fillStyle='rgba(0,0,0,.1)'
+            context.fillStyle='rgba(0,0,0,.2)'
             context.fillRect(0, 0, viewW, viewH);
             clear = 0;
         }
@@ -243,7 +243,7 @@ function drawBody(which) {
     if (thisBody) {
         color = 'hsl('+thisBody.iStr/(thisBody.mass*INERTIA)*100+','+thisBody.iStr*60+'%, '+(thisBody.mass/4+40)+'%)';
         color2 = 'hsla('+thisBody.iStr/(thisBody.mass*INERTIA)*100+','+thisBody.iStr*60+'%, '+(thisBody.mass/4+40)+'%, '+.25+')';
-        color3 = 'hsla('+thisBody.iStr/(thisBody.mass*INERTIA)*100+','+thisBody.iStr*60+'%, '+(thisBody.mass/4+40)+'%, '+.05+')';
+        color3 = 'hsl('+thisBody.iStr/(thisBody.mass*INERTIA)*100+','+thisBody.iStr*60+'%, '+5+'%)';
 
         // Tracer
         ctx1.beginPath();

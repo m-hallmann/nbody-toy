@@ -126,6 +126,25 @@ iframe.stage {
         margin-bottom: 0;   
     }
 
+    a {
+        color: #777;
+        text-decoration: none;
+        border-bottom: 2px solid #777;
+    }
+
+}
+
+.share-me {
+    font-family: 'Staatliches', cursive;    
+    color: #fff;
+    font-size: 30px;
+    position: absolute;
+    bottom: 0px;
+    right: 0;
+    background: #000;
+    padding: .75em;
+    letter-spacing: 1px;
+
 }
     
 @keyframes danger_animation

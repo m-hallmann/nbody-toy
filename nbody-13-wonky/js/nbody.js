@@ -114,7 +114,7 @@ function output(value) {
 }
 
 // Constants
-var N_INITIAL = 1000;     // Number of bodies
+var N_INITIAL = 500;     // Number of bodies
 var G = 0.0667408;       // Gravitational constant - modify this to modulate gravitational strength
 var INERTIA = 1;         // Inertia multiplier - this is a hack!
 var TIME = 1;            // Time multiplier - modify to modulate time flow
