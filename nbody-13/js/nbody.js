@@ -474,13 +474,12 @@ function showUpload() {
   form.style.display = "block";
 }
 
-function uploadJSON(nbody) {
-  console.log("OLD", nbody);
+console.log("OLD", nbody);
+function uploadJSON() {
   var textarea = document.getElementById('uploadTextarea').value;
-  nbody = $.parseJSON('[' + textarea + ']');
-
+  var nbody = JSON.parse('[' + textarea + ']');
   console.log("new", nbody);
-  drawBody(nbody);
+  return nbody;
   animate();
 
 }
