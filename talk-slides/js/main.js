@@ -15,7 +15,7 @@ function addIframe(slideNr) {
   var src = activeSlide.getAttribute('data-src');
 
   if (src) {
-    activeSlide.insertAdjacentHTML('afterbegin', '<iframe src="'+src+'"></iframe>');
+    activeSlide.insertAdjacentHTML('afterbegin', '<iframe class="stage" src="'+src+'"></iframe>');
   }
 }
 

@@ -25,6 +25,17 @@ body, html {
         }
     }
 
+    img.ken-burns {
+        opacity: .3;
+        position: absolute;
+        width: 110vw;
+        height: 110vw;
+        top: 50%;
+        left: 50%;
+        margin: -55vw;
+        animation: ken_burns_animation 120s;
+    }
+
 }
 
 .slide.active {
@@ -132,3 +143,18 @@ iframe.stage {
   75%  {color: blue;}
   100% {color: red;}
 }
+    
+@keyframes ken_burns_animation
+{
+  0%   {
+    width: 110vw;
+    height: 110vw;
+    margin: -55vw;
+  }
+  100% {
+    width: 240vw;
+    height: 240vw;
+    margin: -120vw;
+  }
+}
+

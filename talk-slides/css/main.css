@@ -23,6 +23,15 @@ body, html {
     opacity: 0; }
     .slide video.fill-slide {
       width: 100%; }
+  .slide img.ken-burns {
+    opacity: .3;
+    position: absolute;
+    width: 110vw;
+    height: 110vw;
+    top: 50%;
+    left: 50%;
+    margin: -55vw;
+    animation: ken_burns_animation 120s; }
 
 .slide.active {
   filter: blur(0px);
@@ -112,10 +121,12 @@ iframe.stage {
   100% {
     color: red; } }
 
-
-/* iframes */
-.slide iframe {
-  border: 0;
-  width: 100vw;
-  height: 100vh;
-}
+@keyframes ken_burns_animation {
+  0% {
+    width: 110vw;
+    height: 110vw;
+    margin: -55vw; }
+  100% {
+    width: 240vw;
+    height: 240vw;
+    margin: -120vw; } }
