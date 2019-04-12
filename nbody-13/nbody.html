@@ -56,10 +56,18 @@
     #infobox a {
       color: white;
       text-decoration: none;
+      display: block;
     }
     #infobox p {
       text-align: right;
       margin: .2em;
+    }
+    #uploadForm {
+      display: none;
+    }
+    #uploadTextarea {
+      width: 300px;
+      height: 200px;
     }
 
   </style>
@@ -72,8 +80,17 @@
 
   <div id="infobox">
     <a href="#" id="downloadJSON" onclick="return downloadJSON()">Download JSON</a>
+
+    <a href="#" onclick="return showUpload()">Upload JSON</a>
+
+    <div id="uploadForm">
+      <textarea id="uploadTextarea"></textarea>
+      <button onclick="return uploadJSON()">uplad</button>
+    </div>
+
     <p>Zoom <span id="zoomLevel">0</span></p>
   </div>
+
 
 </body>
 <script src="../stats.min.js"></script>

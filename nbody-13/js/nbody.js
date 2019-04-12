@@ -468,3 +468,19 @@ function downloadJSON(){
   link.setAttribute('href', data);
   link.setAttribute('download', 'nbody-export.json');
 }
+
+function showUpload() {
+  var form = document.getElementById('uploadForm');
+  form.style.display = "block";
+}
+
+function uploadJSON(nbody) {
+  console.log("OLD", nbody);
+  var textarea = document.getElementById('uploadTextarea').value;
+  nbody = $.parseJSON('[' + textarea + ']');
+
+  console.log("new", nbody);
+  drawBody(nbody);
+  animate();
+
+}
