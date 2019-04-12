@@ -8,9 +8,7 @@ function addIframe(slideNr) {
   // delete all iframes
   var allIframes = document.querySelectorAll(".slide iframe");
   for (var i = 0; i < allIframes.length; i++) {
-      if ( i != slideNr) {
-          allIframes[i].parentNode.removeChild(allIframes[i]);
-      }
+      allIframes[i].parentNode.removeChild(allIframes[i]);
   }
 
   var activeSlide = document.querySelectorAll(".slide-"+slideNr)[0];
