@@ -1,237 +1,13 @@
 html, body {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-  position: relative; }
-
-*, *:before, *:after {
-  box-sizing: inherit; }
-
-body {
-  font-family: 'WienerMelange';
-  font-size: 16px;
-  line-height: 28px;
-  min-height: 100%;
-  vertical-align: baseline; }
-  @media (max-width: 720px) {
-    body {
-      font-size: 3.80952vw;
-      line-height: 6.66667vw; } }
-
-h1, h2, h3, h4, h5, h6 {
-  margin: 0;
-  padding: 0;
-  vertical-align: baseline;
-  -ms-word-break: break-all;
-  word-break: break-all;
-  word-break: break-word;
-  -webkit-hyphens: auto;
-  -ms-hyphens: auto;
-  hyphens: auto; }
-
-h1 {
-  font-size: 42.6656px;
-  line-height: 56px;
-  font-weight: 800; }
-  @media (max-width: 720px) {
-    h1 {
-      font-size: 10.15848vw;
-      line-height: 13.33333vw; } }
-
-h2 {
-  font-size: 42.6656px;
-  line-height: 56px;
-  font-weight: 400; }
-  @media (max-width: 720px) {
-    h2 {
-      font-size: 10.15848vw;
-      line-height: 13.33333vw; } }
-
-h3 {
-  font-size: 32px;
-  line-height: 56px;
-  font-weight: 400; }
-  @media (max-width: 720px) {
-    h3 {
-      font-size: 7.61905vw;
-      line-height: 13.33333vw; } }
-
-h4 {
-  font-size: 19.2px;
-  line-height: 28px;
-  font-weight: 400; }
-  @media (max-width: 720px) {
-    h4 {
-      font-size: 4.57143vw;
-      line-height: 6.66667vw; } }
-
-h5 {
-  font-size: 16px;
-  line-height: 28px;
-  font-weight: 600; }
-  @media (max-width: 720px) {
-    h5 {
-      font-size: 3.80952vw;
-      line-height: 6.66667vw; } }
-
-h6 {
-  font-size: 16px;
-  line-height: 28px;
-  font-weight: 600; }
-  @media (max-width: 720px) {
-    h6 {
-      font-size: 3.80952vw;
-      line-height: 6.66667vw; } }
-
-.grid {
-  margin: 0 auto;
-  display: grid;
-  grid-template-columns: repeat(12, 1fr);
-  grid-gap: 28px; }
-
-@media (max-width: 720px) {
-  .grid {
-    width: 86.66667%;
-    grid-gap: 6.66667vw; } }
-
-@media (min-width: 721px) and (max-width: 1025px) {
-  .grid {
-    width: 644px; }
-  .grid.decorator {
-    box-shadow: inset 1px 1px 0px #7b00ff, inset -1px -1px 0px #7b00ff;
-    background-image: -webkit-linear-gradient(0deg, rgba(0, 0, 0, 0) 27px, rgba(0, 123, 255, 0.5) 28px, rgba(0, 0, 0, 0) 28px, rgba(0, 0, 0, 0) 55px, rgba(0, 123, 255, 0.5) 56px), -webkit-linear-gradient(top, rgba(0, 0, 0, 0) 6px, rgba(0, 0, 0, 0.1) 7px, rgba(0, 0, 0, 0) 7px, rgba(0, 0, 0, 0) 13px, rgba(0, 0, 0, 0.2) 14px, rgba(0, 0, 0, 0) 14px, rgba(0, 0, 0, 0) 20px, rgba(255, 0, 225, 0.35) 21px, rgba(0, 0, 0, 0) 21px, rgba(0, 0, 0, 0) 27px, rgba(0, 123, 255, 0.75) 28px);
-    background-size: 56px 100%, 100% 28px;
-    background-position: 0px 0px; } }
-
-@media (min-width: 1025px) and (max-width: 1366px) {
-  .grid {
-    width: 980px; }
-  .grid.decorator {
-    box-shadow: inset 1px 1px 0px #7b00ff, inset -1px -1px 0px #7b00ff;
-    background-image: -webkit-linear-gradient(0deg, rgba(0, 0, 0, 0) 27px, rgba(0, 0, 0, 0.1) 28px, rgba(0, 0, 0, 0) 28px, rgba(0, 0, 0, 0) 55px, rgba(0, 123, 255, 0.5) 56px, rgba(0, 0, 0, 0) 56px, rgba(0, 0, 0, 0) 83px, rgba(0, 123, 255, 0.5) 84px), -webkit-linear-gradient(top, rgba(0, 0, 0, 0) 6px, rgba(0, 0, 0, 0.1) 7px, rgba(0, 0, 0, 0) 7px, rgba(0, 0, 0, 0) 13px, rgba(0, 0, 0, 0.2) 14px, rgba(0, 0, 0, 0) 14px, rgba(0, 0, 0, 0) 20px, rgba(255, 0, 225, 0.35) 21px, rgba(0, 0, 0, 0) 21px, rgba(0, 0, 0, 0) 27px, rgba(0, 123, 255, 0.75) 28px);
-    background-size: 84px 100%, 100% 28px;
-    background-position: 0px 0px; } }
-
-@media (min-width: 1367px) {
-  .grid {
-    width: 1316px; }
-  .grid.decorator {
-    box-shadow: inset 1px 1px 0px #7b00ff, inset -1px -1px 0px #7b00ff;
-    background-image: -webkit-linear-gradient(0deg, rgba(0, 0, 0, 0) 27px, rgba(0, 0, 0, 0.1) 28px, rgba(0, 0, 0, 0) 28px, rgba(0, 0, 0, 0) 55px, rgba(0, 0, 0, 0.1) 56px, rgba(0, 0, 0, 0) 56px, rgba(0, 0, 0, 0) 83px, rgba(0, 123, 255, 0.5) 84px, rgba(0, 0, 0, 0) 84px, rgba(0, 0, 0, 0) 111px, rgba(0, 123, 255, 0.5) 112px), -webkit-linear-gradient(top, rgba(0, 0, 0, 0) 6px, rgba(0, 0, 0, 0.1) 7px, rgba(0, 0, 0, 0) 7px, rgba(0, 0, 0, 0) 13px, rgba(0, 0, 0, 0.2) 14px, rgba(0, 0, 0, 0) 14px, rgba(0, 0, 0, 0) 20px, rgba(255, 0, 225, 0.35) 21px, rgba(0, 0, 0, 0) 21px, rgba(0, 0, 0, 0) 27px, rgba(0, 123, 255, 0.75) 28px);
-    background-size: 112px 100%, 100% 28px;
-    background-position: 0px 0px; } }
-
-.grid > div {
-  background: rgba(255, 0, 0, 0.025); }
-
-@media (max-width: 720px) {
-  .grid > .cell-1,
-  .grid > .cell-2,
-  .grid > .cell-3,
-  .grid > .cell-4,
-  .grid > .cell-5,
-  .grid > .cell-6,
-  .grid > .cell-7,
-  .grid > .cell-8,
-  .grid > .cell-9,
-  .grid > .cell-10,
-  .grid > .cell-11,
-  .grid > .cell-12 {
-    grid-column: span 12; } }
-
-@media (min-width: 721px) {
-  .grid > .cell-1 {
-    grid-column: span 1; }
-  .grid > .cell-2 {
-    grid-column: span 2; }
-  .grid > .cell-3 {
-    grid-column: span 3; }
-  .grid > .cell-4 {
-    grid-column: span 4; }
-  .grid > .cell-5 {
-    grid-column: span 5; }
-  .grid > .cell-6 {
-    grid-column: span 6; }
-  .grid > .cell-7 {
-    grid-column: span 7; }
-  .grid > .cell-8 {
-    grid-column: span 8; }
-  .grid > .cell-9 {
-    grid-column: span 9; }
-  .grid > .cell-10 {
-    grid-column: span 10; }
-  .grid > .cell-11 {
-    grid-column: span 11; }
-  .grid > .cell-12 {
-    grid-column: span 12; } }
-
-.media {
-  display: block;
-  position: relative;
-  width: 100%;
-  background: rgba(255, 0, 255, 0.25);
-  margin-bottom: 28px; }
-  .media:before {
-    content: '';
-    display: block; }
-  .media.media-1-1:before {
-    padding-top: 100%; }
-  .media.media-1-2:before {
-    padding-top: 200%; }
-  .media.media-1:before {
-    padding-top: 28px; }
-  .media.media-2:before {
-    padding-top: 56px; }
-  .media.media-3:before {
-    padding-top: 84px; }
-  .media.media-4:before {
-    padding-top: 112px; }
-  .media.media-5:before {
-    padding-top: 140px; }
-  .media.media-6:before {
-    padding-top: 168px; }
-  .media.media-7:before {
-    padding-top: 196px; }
-  .media.media-8:before {
-    padding-top: 224px; }
-  .media.media-9:before {
-    padding-top: 252px; }
-  .media.media-10:before {
-    padding-top: 280px; }
-  .media.media-11:before {
-    padding-top: 308px; }
-  .media.media-12:before {
-    padding-top: 336px; }
-  .media.media-13:before {
-    padding-top: 364px; }
-  .media.media-14:before {
-    padding-top: 392px; }
-  .media.media-15:before {
-    padding-top: 420px; }
-  .media.media-16.cell-1 {
-    padding-top: 448px; }
-  .media.media-17:before {
-    padding-top: 476px; }
-  .media.media-18:before {
-    padding-top: 504px; }
-  .media.media-19:before {
-    padding-top: 532px; }
-  .media.media-20:before {
-    padding-top: 560px; }
-  .media.media-21:before {
-    padding-top: 588px; }
-  .media.media-22:before {
-    padding-top: 616px; }
-  .media.media-23:before {
-    padding-top: 644px; }
-  .media.media-24:before {
-    padding-top: 672px; }
-  .media:last-child {
-    margin-bottom: 0; }
-
-html, body {
   font-family: 'Staatliches', cursive;
   font-family: 'Noto Serif TC', serif; }
+
+body, html {
+  background: #000;
+  margin: 0;
+  padding: 0;
+  width: 100vw;
+  height: 100vh; }
 
 .slide {
   background: #000;
@@ -239,7 +15,15 @@ html, body {
   height: 100vh;
   width: 100vw;
   top: 0px;
-  left: 0px; }
+  left: 0px;
+  opacity: 0;
+  filter: blur(100px);
+  transition: all 0.8s; }
+
+.slide.active {
+  filter: blur(0px);
+  opacity: 1;
+  transition: all 0.8s; }
 
 iframe.stage {
   background: #000;
@@ -261,12 +45,29 @@ iframe.stage {
   z-index: 0;
   color: #fff;
   padding: 1em;
-  background: rgba(0, 0, 0, 0.85); }
+  background: rgba(0, 0, 0, 0.85);
+  padding: 50px; }
   .slide article h1, .slide article h2 {
+    margin: 0;
+    padding: 0;
     font-family: 'Noto Serif TC', serif;
     font-weight: 200;
-    font-size: 140px;
+    font-size: 100px;
     line-height: 1.1em;
     color: #77c4ff; }
+    .slide article h1 small, .slide article h2 small {
+      margin-top: .5em;
+      display: block;
+      font-family: 'Staatliches', cursive;
+      color: #fff;
+      font-size: 40px;
+      line-height: 1.1em;
+      letter-spacing: 2px; }
+  .slide article h1 {
+    font-size: 180px; }
+    .slide article h1.danger {
+      font-family: 'Staatliches', cursive;
+      color: #a00; }
   .slide article p {
+    font-size: 40px;
     font-family: 'Staatliches', cursive; }

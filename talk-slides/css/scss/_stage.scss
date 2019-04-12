@@ -1,3 +1,11 @@
+body, html {
+    background: #000;
+    margin: 0;
+    padding: 0;
+    width: 100vw;
+    height: 100vh;
+}
+
 .slide {
     background: #000;
     position: absolute;
@@ -5,6 +13,15 @@
     width: 100vw;
     top: 0px;
     left: 0px;
+    opacity: 0;
+    filter: blur(100px);
+    transition: all 0.8s;
+}
+
+.slide.active {
+    filter: blur(0px);
+    opacity: 1;
+    transition: all 0.8s;
 }
 
 iframe.stage {
@@ -29,17 +46,41 @@ iframe.stage {
     color: #fff;
     padding: 1em;
     background: rgba(0,0,0,.85);
+    padding: 50px;
 
     h1, h2 {
+        margin: 0;
+        padding: 0;
         font-family: 'Noto Serif TC', serif;
         font-weight: 200;
-        font-size: 140px;
+        font-size: 100px;
         line-height: 1.1em;
         color: rgb(119, 196, 255);
+
+        small {
+            margin-top: .5em;
+            display: block;
+            font-family: 'Staatliches', cursive;
+            color: #fff;
+            font-size: 40px;
+            line-height: 1.1em;
+            letter-spacing: 2px;
+        }
     }
 
+    h1 {
+        font-size: 180px;
+
+        &.danger {
+            font-family: 'Staatliches', cursive;    
+            color: #a00;
+
+        }
+    }
+    
     p {
-        font-family: 'Staatliches', cursive;
+        font-size: 40px;
+        font-family: 'Staatliches', cursive;    
     }
 }
     
