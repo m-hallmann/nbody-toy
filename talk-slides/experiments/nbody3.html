@@ -139,7 +139,6 @@ function update() {
 
         if (mydist < 100) {
           var opacity = (100 - mydist) / 100;
-          console.log(opacity);
           if (contact < opacity) { contact = opacity }
           ctx.beginPath();
           ctx.moveTo(nbody[i].x,nbody[i].y);

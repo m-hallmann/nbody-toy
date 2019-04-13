@@ -28,7 +28,6 @@ for (var i = 0; i < slides.length; i++) {
 
 
 document.body.addEventListener("keyup", function(event) {
-    console.log(event.keyCode);
 
     // arrow.right arrow.bottom spacebar enter
     if (event.isComposing || event.keyCode === 39 || event.keyCode === 40 || event.keyCode === 32 || event.keyCode === 13 || event.keyCode === 34) {
@@ -54,7 +53,6 @@ document.body.addEventListener("keyup", function(event) {
             slides[i].classList.remove("active");
             //slides[i].getElementById('iframe-'+i).setAttribute('src', '');
         }
-        console.log(slideCounter);
         slides[slideCounter].classList.add("active");
         //slides[slideCounter].getElementById('iframe-' + slideCounter).setAttribute(
         //    'src',

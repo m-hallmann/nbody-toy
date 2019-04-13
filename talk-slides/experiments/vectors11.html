@@ -133,7 +133,6 @@ function update() {
         // this is why we reduce is slowly to 0 and limit myDist to the sum of both bodies radii.
         // a merge would not reduce is, but inherit it to the surviving entity.
         if ( myDist < (Math.sqrt(nbody[i].m/Math.PI) + Math.sqrt(nbody[j].m/Math.PI)) ) {
-          console.log('collision');
           //console.log('collision ' + i + '   ' + j);
           //myDist = Math.sqrt(nbody[i].m/Math.PI) + Math.sqrt(nbody[j].m/Math.PI);
           //nbody[i].is = nbody[i].is * .001;
@@ -201,7 +200,6 @@ function update() {
     }
 
     // update position based on impulse vector
-    console.log(i + '      ' + nbody[i].ia);
     nbody[i].x += (Math.cos(nbody[i].ia)*nbody[i].is);
     nbody[i].y += (Math.sin(nbody[i].ia)*nbody[i].is);
   }

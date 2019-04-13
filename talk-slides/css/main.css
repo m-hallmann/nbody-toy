@@ -8,7 +8,8 @@ body, html {
   padding: 0;
   width: 100vw;
   height: 100vh;
-  overflow: hidden; }
+  overflow: hidden;
+  cursor: none; }
 
 .slide {
   position: absolute;
@@ -24,13 +25,14 @@ body, html {
     .slide video.fill-slide {
       width: 100%; }
   .slide img.ken-burns {
-    opacity: .3;
+    opacity: .75;
     position: absolute;
     width: 110vw;
     height: 110vw;
     top: 50%;
     left: 50%;
     margin: -55vw;
+    transform: rotate(0);
     animation: ken_burns_animation 120s; }
   .slide img.centered {
     height: 100vh; }
@@ -40,7 +42,7 @@ body, html {
   opacity: 1;
   transition: all 1s; }
   .slide.active video {
-    opacity: .25; }
+    opacity: .75; }
 
 iframe.stage {
   background: #000;
@@ -120,7 +122,7 @@ iframe.stage {
   position: absolute;
   bottom: 0px;
   right: 0;
-  background: #000;
+  background: rgba(0, 0, 0, 0.5);
   padding: .75em;
   letter-spacing: 1px; }
 
@@ -150,6 +152,6 @@ iframe.stage {
     height: 110vw;
     margin: -55vw; }
   100% {
-    width: 240vw;
-    height: 240vw;
-    margin: -120vw; } }
+    width: 300vw;
+    height: 300vw;
+    margin: -150vw; } }

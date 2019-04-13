@@ -35,18 +35,24 @@
  *   TODOS
  * --------------------------------------
  *   
+ *   - Main sequence coloring for heavy bodies
+ *   - Illumination for non glowing bodies
+ *   - Realistic colorset
+ *   - Better tracers
+ *   - Basic UI
  *   - Shift Floats by 100.000.000 for precision
  *   - Timeshift
  *      - Add a time multiplier variable to main calc.
  *      - Add a slider that controls simulation speed
  *        +/-/0, shift, ctrl keybinding
+ * 
  *      - Automatically match simulation speed to processor load/frame
  *   - Zoom
  *      - Button: Center on heaviest object
  *        This requires:
  *         - Coordinate system offset
  *         - Frame by frame redrawing of offset
- *   - Bodies vanishing at 2x viewW
+ *   - JSON Export
  *   - Infinite Spherical 2D-Universe
  *      - We could add 4 additional attraction vectors,
  *        and effectively mirror the universe in x and y twice
@@ -86,10 +92,8 @@
  *           force, and always adds up to 100% of the previous body.
  *      - Material Ejection
  *        This requires research. How can ejections be expressed?
- *        
+ *
  */
-
-
 
 /*
  * --------------------------------------
@@ -114,7 +118,7 @@ var N_INITIAL = 750;     // Number of bodies
 var G = 0.0667408;       // Gravitational constant - modify this to modulate gravitational strength
 var INERTIA = 1;         // Inertia multiplier - this is a hack!
 var TIME = 1;            // Time multiplier - modify to modulate time flow
-var CLR = 350;            // clear constant; every CLRth iteration, the screen is cleared with opaque black.
+var CLR = 25;            // clear constant; every CLRth iteration, the screen is cleared with opaque black.
 
 // Init Variables
 var viewW = window.innerWidth;           // viewport width, not updated!
@@ -130,23 +134,41 @@ var clear = 0;           // counts from 0 to CLR
 var thisBody, pBody, aBody, color, isPBody, sumDX, sumDY;
 
 // Init Canvases
-var canvas0 = document.getElementById("primary-canvas");
+
+// This canvas is attached to the DOM and outputs the visuals
+var canvas0 = document.getElementById("canvas");
 var ctx0 = canvas0.getContext("2d");
 ctx0.canvas.width  = viewW;
 ctx0.canvas.height = viewH;
 
-var canvas1 = document.getElementById("secondary-canvas");
+// These canvases we draw everything in off DOM for performance gain
+
+// tracer
+var canvas1 = document.createElement("canvas");
+canvas1.width = viewW;
+canvas1.height = viewH;
 var ctx1 = canvas1.getContext("2d");
-ctx1.canvas.width  = viewW;
-ctx1.canvas.height = viewH;
+
+// Glow
+var canvas2 = document.createElement("canvas");
+canvas2.width = viewW;
+canvas2.height = viewH;
+var ctx2 = canvas2.getContext("2d");
+
+// Body
+var canvas3 = document.createElement("canvas");
+canvas3.width = viewW;
+canvas3.height = viewH;
+var ctx3 = canvas3.getContext("2d");
+
 
 // Populate N-Body Array
 for (var i = 0; i < n; i++) {
-    var myMass = 2 + Math.random() * 10;
+    var myMass = 100 + Math.random();
     nbody.push({
         x: (Math.random() * viewW) - viewW/2,
         y: (Math.random() * viewH) - viewH/2,
-        iStr: Math.random() * 15,
+        iStr: Math.random(),
         iAng: Math.random() * Math.PI * 2,
         mass: myMass,
         radius: radius(myMass),
@@ -207,8 +229,7 @@ function clearCanvas(context, opaque) {
     if (opaque) {
         // opaqueness is created by a relatively intransparent clear effect and a clear counter, only working it every CLR iterations. this reduces grey traces.
         if (clear == CLR) {
-            // draw 10% opacity black on canvas
-            context.fillStyle='rgba(0,0,0,.1)'
+            context.fillStyle='rgba(0,0,0,.2)'
             context.fillRect(0, 0, viewW, viewH);
             clear = 0;
         }
@@ -221,23 +242,17 @@ function drawBody(which) {
     thisBody = nbody[which];
     if (thisBody) {
         color = 'hsl('+thisBody.iStr/(thisBody.mass*INERTIA)*100+','+thisBody.iStr*60+'%, '+(thisBody.mass/4+40)+'%)';
-
-        // Tracer
-        ctx0.beginPath();
-        ctx0.arc(thisBody.x * scale + offsetX,thisBody.y * scale + offsetY,.05,0,2*Math.PI);
-        ctx0.strokeStyle = color;
-        ctx0.fillStyle = color;
-        ctx0.fill();
-        ctx0.stroke();
-
+        color2 = 'hsla('+thisBody.iStr/(thisBody.mass*INERTIA)*100+','+thisBody.iStr*60+'%, '+(thisBody.mass/4+40)+'%, '+.25+')';
+        color3 = 'hsl('+thisBody.iStr/(thisBody.mass*INERTIA)*100+','+thisBody.iStr*60+'%, '+5+'%)';
+        
         // Body
-        ctx1.beginPath();
-        ctx1.arc(thisBody.x * scale + offsetX, thisBody.y * scale + offsetY, thisBody.radius * scale,0,2*Math.PI);
-        ctx1.strokeStyle = color;
-        ctx1.fillStyle = color;
-        ctx1.fill();
-        ctx1.stroke();
-
+        ctx3.beginPath();
+        ctx3.arc(thisBody.x * scale + offsetX, thisBody.y * scale + offsetY, thisBody.radius * scale,0,2*Math.PI);
+        ctx3.strokeStyle = color;
+        //ctx3.fillStyle = color;
+        ctx3.fill();
+        ctx3.stroke();
+        
     }
 }
 
@@ -248,45 +263,27 @@ function mergeBodies(i, j) {
     // randomly have the exact same mass. so as a dirty fix, we do only merge bodies of non equal masses.
     if (pBody.mass > aBody.mass) {
 
-
-        pBody.mass += aBody.mass/10;
-        aBody.mass *= .9;
-
-        //removing item by filtering array
-        if (aBody.mass <=1) {
-            nbody = nbody.filter(c=>c!==nbody[j]);
-            pBody.mass += aBody.mass;
-        }
-
-        // updating radii calulations
+        pBody.mass += aBody.mass;
         pBody.radius = radius(pBody.mass);
-        aBody.radius = radius(aBody.mass);
-
-        // adding vectors of pBody and aBody
         sumDX = deltaX(pBody.iAng, pBody.iStr) + deltaX(aBody.iAng, aBody.iStr)
         sumDY = deltaY(pBody.iAng, pBody.iStr) + deltaY(aBody.iAng, aBody.iStr);
-        // expressing pBody vector as angle/strength pair
         pBody.iStr = dist(pBody.x, pBody.y, pBody.x + sumDX, pBody.y + sumDY);
         pBody.iAng = Math.PI * .5 - radian(pBody.x, pBody.y, pBody.x + sumDX, pBody.y + sumDY);
-        // dampening aBody impulse strength. this calculation is wrong!
-        aBody.iStr *= .35;
+
+        //removing item by filtering array
+        nbody = nbody.filter(c=>c!==nbody[j]);
 
     } else if (pBody.mass > aBody.mass) {
 
-        aBody.mass += pBody.mass/10;
-        pBody.mass *= .9;
-
-        if (pBody.mass <=1) {
-            nbody = nbody.filter(c=>c!==nbody[i]);
-            aBody.mass += pBody.mass;
-        }
-
+        aBody.mass += pBody.mass;
         aBody.radius = radius(aBody.mass);
         sumDX = deltaX(aBody.iAng, aBody.iStr) + deltaX(pBody.iAng, pBody.iStr)
         sumDY = deltaY(aBody.iAng, aBody.iStr) + deltaY(pBody.iAng, pBody.iStr);
         aBody.iStr = dist(aBody.x, aBody.y, aBody.x + sumDX, aBody.y + sumDY);
         aBody.iAng = Math.PI * .5 - radian(aBody.x, aBody.y, aBody.x + sumDX, aBody.y + sumDY);
 
+        //removing item by filtering array
+        nbody = nbody.filter(c=>c!==nbody[i]);
     }
 
     n = nbody.length;
@@ -299,8 +296,8 @@ window.addEventListener('mousedown', function(event) {
 
     // x and y should also consider zoom level!
     nbody.push({
-        x: event.clientX - viewW/2,
-        y: event.clientY - viewH/2,
+        x: (event.clientX - offsetX) / scale,
+        y: (event.clientY - offsetY) / scale,
         iStr: 15 + Math.random() * 15,
         iAng: Math.random() * Math.PI * 2,
         mass: myMass,
@@ -309,6 +306,28 @@ window.addEventListener('mousedown', function(event) {
     });
     n = nbody.length;
 }, false); 
+
+
+//var mousedownID = -1;  //Global ID of mouse down interval
+//function mousedown(event) {
+//  if(mousedownID==-1)  //Prevent multimple loops!
+//     mousedownID = setInterval(whilemousedown, 100 /*execute every 100ms*/);
+//}
+//function mouseup(event) {
+//     if(mousedownID!=-1) {  //Only stop if exists
+//       clearInterval(mousedownID);
+//     mousedownID=-1;
+//   }
+//}
+//function whilemousedown() {
+   /*here put your code*/
+//}
+//Assign events
+//document.addEventListener("mousedown", mousedown);
+//document.addEventListener("mouseup", mouseup);
+//Also clear the interval when user leaves the window with mouse
+//document.addEventListener("mouseout", mouseup);
+
 
 
 // Scroll for Zoom
@@ -334,14 +353,22 @@ function setZoom(delta, mouse) {
     }
 
     // clear tracer canvas
-    ctx0.clearRect(0, 0, viewW, viewH);
+    ctx1.clearRect(0, 0, viewW, viewH);
 
+}
+
+function outputVisuals() {
+    ctx0.clearRect(0, 0, viewW, viewH);
+    // copy canvas 1 & 2 content to canvas 0
+    ctx0.drawImage(canvas1, 0, 0);
+    ctx0.drawImage(canvas2, 0, 0);
+    ctx0.drawImage(canvas3, 0, 0);
 }
 
 // this checks the amount of bodies and the distance of the current pair,
 // to limit calulations for large groups. bad implementation, but very simple.
 function powerSaving(distance, amount) {
-    if ((amount > 500) && (distance > 300)) {
+    if ((amount > 500) && (distance > 500)) {
         return false;
     } else {
         return true;
@@ -359,8 +386,9 @@ function update() {
     output(n);
 
     // clear canvases
-    clearCanvas(ctx0, true);
-    clearCanvas(ctx1, false);
+    clearCanvas(ctx1, true);
+    clearCanvas(ctx2, false);
+    clearCanvas(ctx3, false);
 
 
     // Outer Loop
@@ -385,7 +413,6 @@ function update() {
                     // prevent calculating attraction of a body on itself. (would be infinite because 0 distance)
                     // prevent attraction Calc for distances > 500px.
                     // this is a dirty performance fix!
-
                     if ((i != j) && powerSaving(thisDistance, n)) {
 
                         // This prevents NaN, undefined and false values for thisDistance
@@ -393,8 +420,8 @@ function update() {
                         thisDistance = thisDistance || 0;
 
                         // collision check, tests for touching bodies
-                        if (thisDistance >= (pBody.radius + aBody.radius) ) {
-                            
+
+                        if (thisDistance > (pBody.radius + aBody.radius) ) {
                             // No Collision
                             // --------------
 
@@ -402,6 +429,7 @@ function update() {
                             var thisRadian = radian(pBody.x, pBody.y, aBody.x, aBody.y);
                             // calculate attraction vector for aBody's effect on pBody
                             // This vector is only affecting pBody!
+
                             var thisAttraction = grav(pBody.mass, aBody.mass, thisDistance);
 
                             // draw attraction vector from aBody to pBody
@@ -413,51 +441,50 @@ function update() {
                             var aStr = dist(pBody.x, pBody.y, pBody.x + deltaX(pBody.iAng, pBody.iStr) + attractionX, pBody.y + deltaY(pBody.iAng, pBody.iStr) + attractionY);
                             var aAng = Math.PI * .5 - radian(pBody.x, pBody.y, pBody.x + deltaX(pBody.iAng, pBody.iStr) + attractionX, pBody.y + deltaY(pBody.iAng, pBody.iStr) + attractionY);
 
-                            // update pBody attraction vector.
+                            // update pBody impulse vector.
                             // can't be done as part of the before statement because the aAng line references the previous pBody.iStr value!
 
                             pBody.iStr = aStr;
                             pBody.iAng = aAng;
-
                         } else {
-                            
-                            // Collision
-                            // -----------
+                            //calculate overlap, use overlap as repulsive force
+                            var repulsion = ((pBody.radius + aBody.radius) - thisDistance);
+                            repulsion *= repulsion;
+                            //invert attraction angle by 180° or 3.1415
+                            var thisRadian = radian(pBody.x, pBody.y, aBody.x, aBody.y) + Math.PI;
 
-                            // find out which is the larger object, that one will eat the smaller one.
-                            // eventually, we'll do this gradually for a smoother visual effect.
-                            // we could even simulate explosive collisions, but we need a cohesion calculation,
-                            // based on impulse, mass and density as a simplified model.
-
-                            mergeBodies(i, j);
-
-                            pBody.iStr *= .9999999;
+                            var repulsionX = deltaY(thisRadian, repulsion);
+                            var repulsionY = deltaX(thisRadian, repulsion);
+    
+                            // Calculate vector product of pBody impulse vector and repulsion vecor
+                            var rStr = dist(pBody.x, pBody.y, pBody.x + deltaX(pBody.iAng, pBody.iStr) + repulsionX, pBody.y + deltaY(pBody.iAng, pBody.iStr) + repulsionY);
+                            var rAng = Math.PI * .5 - radian(pBody.x, pBody.y, pBody.x + deltaX(pBody.iAng, pBody.iStr) + repulsionX, pBody.y + deltaY(pBody.iAng, pBody.iStr) + repulsionY);
+    
+                            // update pBody impulse vector.
+                            // can't be done as part of the before statement because the aAng line references the previous pBody.iStr value!
+    
+                            pBody.iStr = rStr;
+                            pBody.iAng = rAng;
+                            pBody.iStr *= .995;
                         }
-
                     }
-
                 }
             }
         }
 
-
-
         // Update Positions
         // updates x,y position based on impulse vector.
-        // very wonky impulse/momentum implementation. needs fixing!
         pBody.x += deltaX(pBody.iAng, (pBody.iStr/2) / (pBody.mass * INERTIA));
         pBody.y += deltaY(pBody.iAng, (pBody.iStr/2) / (pBody.mass * INERTIA));
 
         drawBody(i);
 
-        // Count down collision avoider
-        // this avoider is used to prevent
-        // bodies spawned by collisions & mousevents
-        // to immediately merge again
         if (pBody.untouchable > 0) {
             pBody.untouchable--;
         }
     }
+
+    outputVisuals();
 
     // increment clear counter for opaque tracers
     clear++;

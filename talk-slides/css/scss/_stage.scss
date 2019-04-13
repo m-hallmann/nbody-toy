@@ -5,7 +5,7 @@ body, html {
     width: 100vw;
     height: 100vh;
     overflow: hidden;
-   //cursor: none;
+    cursor: none;
 }
 
 .slide {
@@ -27,13 +27,14 @@ body, html {
     }
 
     img.ken-burns {
-        opacity: .3;
+        opacity: .75;
         position: absolute;
         width: 110vw;
         height: 110vw;
         top: 50%;
         left: 50%;
         margin: -55vw;
+        transform: rotate(0);
         animation: ken_burns_animation 120s;
     }
 
@@ -48,7 +49,7 @@ body, html {
     transition: all 1s;
 
     video {
-        opacity: .25;
+        opacity: .75;
     }
 
 }
@@ -153,7 +154,7 @@ iframe.stage {
     position: absolute;
     bottom: 0px;
     right: 0;
-    background: #000;
+    background: rgba(0,0,0,.5);
     padding: .75em;
     letter-spacing: 1px;
 
@@ -183,9 +184,9 @@ iframe.stage {
     margin: -55vw;
   }
   100% {
-    width: 240vw;
-    height: 240vw;
-    margin: -120vw;
+    width: 300vw;
+    height: 300vw;
+    margin: -150vw;
   }
 }
 

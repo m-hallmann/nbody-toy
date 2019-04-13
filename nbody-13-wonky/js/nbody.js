@@ -335,7 +335,6 @@ window.addEventListener('mousedown', function(event) {
         untouchable: 10
     });
     n = nbody.length;
-    //console.log(nbody[n-1]);
 }, false); 
 
 
