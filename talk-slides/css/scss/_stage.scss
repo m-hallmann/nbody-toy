@@ -5,7 +5,7 @@ body, html {
     width: 100vw;
     height: 100vh;
     overflow: hidden;
-    cursor: none;
+   //cursor: none;
 }
 
 .slide {
@@ -37,6 +37,9 @@ body, html {
         animation: ken_burns_animation 120s;
     }
 
+    img.centered {
+        height: 100vh;
+    }
 }
 
 .slide.active {

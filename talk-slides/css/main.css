@@ -8,8 +8,7 @@ body, html {
   padding: 0;
   width: 100vw;
   height: 100vh;
-  overflow: hidden;
-  cursor: none; }
+  overflow: hidden; }
 
 .slide {
   position: absolute;
@@ -33,6 +32,8 @@ body, html {
     left: 50%;
     margin: -55vw;
     animation: ken_burns_animation 120s; }
+  .slide img.centered {
+    height: 100vh; }
 
 .slide.active {
   filter: blur(0px);
