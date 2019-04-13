@@ -22,8 +22,10 @@ function addIframe(slideNr) {
 
 slides[0].classList.add('active');
 for (var i = 0; i < slides.length; i++) {
+    
     slides[i].classList.add('slide-'+i);
 }
+
 
 document.body.addEventListener("keyup", function(event) {
     console.log(event.keyCode);
