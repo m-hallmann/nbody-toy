@@ -5,6 +5,7 @@ body, html {
     width: 100vw;
     height: 100vh;
     overflow: hidden;
+    cursor: none;
 }
 
 .slide {
@@ -123,7 +124,15 @@ iframe.stage {
     p {
         font-size: 40px;
         font-family: 'Staatliches', cursive; 
-        margin-bottom: 0;   
+        margin-bottom: 0;
+
+        &.copy {
+            font-size: 15px;
+            font-family: 'Noto Serif TC', serif;
+            color: #777;
+            font-style: italic;
+            margin-top: 1.5em;
+        }
     }
 
     a {

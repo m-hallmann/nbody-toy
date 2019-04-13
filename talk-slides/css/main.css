@@ -8,7 +8,8 @@ body, html {
   padding: 0;
   width: 100vw;
   height: 100vh;
-  overflow: hidden; }
+  overflow: hidden;
+  cursor: none; }
 
 .slide {
   position: absolute;
@@ -100,6 +101,12 @@ iframe.stage {
     font-size: 40px;
     font-family: 'Staatliches', cursive;
     margin-bottom: 0; }
+    .slide article p.copy {
+      font-size: 15px;
+      font-family: 'Noto Serif TC', serif;
+      color: #777;
+      font-style: italic;
+      margin-top: 1.5em; }
   .slide article a {
     color: #777;
     text-decoration: none;

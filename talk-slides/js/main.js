@@ -26,16 +26,18 @@ for (var i = 0; i < slides.length; i++) {
 }
 
 document.body.addEventListener("keyup", function(event) {
+    console.log(event.keyCode);
+
     // arrow.right arrow.bottom spacebar enter
-    if (event.isComposing || event.keyCode === 39 || event.keyCode === 40 || event.keyCode === 32 || event.keyCode === 13) {
+    if (event.isComposing || event.keyCode === 39 || event.keyCode === 40 || event.keyCode === 32 || event.keyCode === 13 || event.keyCode === 34) {
         slideCounter++;
     }
     // arrow.up arrow.left backspace escape
-    else if (event.keyCode === 37 || event.keyCode === 38 || event.keyCode === 8 || event.keyCode === 27) {
+    else if (event.keyCode === 37 || event.keyCode === 38 || event.keyCode === 8 || event.keyCode === 33) {
         slideCounter--;
     }
     // home
-    else if (event.keyCode === 36) {
+    else if (event.keyCode === 36 || event.keyCode === 27 || event.keyCode === 116) {
         slideCounter = 0;
     }
     // home
